@@ -11,7 +11,7 @@
 /*
  * Function to print information about a FAT filesystem (useful for debugging).
  */
-void print_filesystem_info(const filesystem_info *fsinfo)
+void print_filesystem_info(const fsinfo_t* fsinfo)
 {
     printf ("Sector size: %zu\n", fsinfo->sector_size);
     printf ("Cluster size in sectors: %u\n", fsinfo->cluster_size);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     void * mem = open_filesystem(argc, argv);
     int i;
 
-    filesystem_info *fsinfo = initialize_filesystem_info(mem);
+    fsinfo_t* fsinfo = fsinfo_init(mem);
     print_filesystem_info(fsinfo);
     putchar('\n');
 

@@ -8,36 +8,40 @@
 #define FATFS_H
 
 #include <stdlib.h>
+#include <stdint.h>
+
 #include "fat12.h"
 #include "fat32.h"
 
-typedef enum {
+enum FS_TYPE {
   FAT12 = 12,
   FAT16 = 16,
   FAT32 = 32
-} FS_TYPE;
+};
 
+typedef enum FS_TYPE FS_TYPE;
 
-typedef struct {
-  //    int file_descriptor;           /* File descriptor returned by open().   */
-  FS_TYPE fs_type;
-  void *diskStart;               /* This is where in memory the disk starts*/
-  size_t sector_size;            /* Size of one sector on the disk.       */
-  unsigned int cluster_size;     /* Number of sectors per cluster.        */
-  unsigned int rootdir_size;     /* Number of entries in root directory.  */
-  
-  unsigned int sectors_per_fat;  /* Number of sectors per fat.            */
-  unsigned int hidden_sectors;   /* Number of hidden sectors.             */
-  unsigned int reserved_sectors; /* Number of reserved sectors.           */
-  unsigned int sectors_for_root; /* Number of sectors for root directory. */
+struct fsinfo_t
+{
+    int32_t  file_descriptor;  /* File descriptor returned by open().       */
+    FS_TYPE  fs_type;
+    void     *disk_start;      /* This is where in memory the disk starts   */
+    size_t   sector_size;      /* Size of one sector on the disk.           */
+    uint32_t cluster_size;     /* Number of sectors per cluster.            */
+    uint32_t rootdir_size;     /* Number of entries in root directory.      */
 
-  unsigned int fat_offset;       /* First sector of the first FAT copy.   */
-  unsigned int rootdir_offset;   /* First sector of the root directory.   */
-  unsigned int cluster_offset;   /* Sector number of the first cluster.   */
+    uint32_t sectors_per_fat;  /* Number of sectors per fat.                */
+    uint32_t hidden_sectors;   /* Number of hidden sectors.                 */
+    uint32_t reserved_sectors; /* Number of reserved sectors.               */
+    uint32_t sectors_for_root; /* Number of sectors for root directory.     */
+
+    uint32_t fat_offset;       /* First sector of the first FAT copy.       */
+    uint32_t rootdir_offset;   /* First sector of the root directory.       */
+    uint32_t cluster_offset;   /* Sector number of the first cluster.       */
  
-  // If you need additional structure fields add them here
- 
-} filesystem_info;
+}; 
+
+typedef struct fsinfo_t fsinfo_t;
 
 /*
  * Function to open the file system.
@@ -48,6 +52,6 @@ void* open_filesystem(int argc, char *argv[]);
  * This function sets up information about a FAT filesystem that will be used to read from
  * that file system.
  */
-filesystem_info *initialize_filesystem_info(void *fg);
+fsinfo_t* fsinfo_init(void *disk_start);
 
 #endif

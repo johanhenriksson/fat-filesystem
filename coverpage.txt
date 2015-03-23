@@ -30,19 +30,10 @@ this file then you should make a minor change to the file, such as
 adding a comment in the Acknowledgement section and then resubmit the
 file. If working in pairs both of you must do this.
 
-
 STUDENT  1
-Name :
-St. No:
-Unix Id :
-Email:
-
-
-STUDENT  2
-Name :
-St. No:
-Unix Id :
-Email:
-
+Name :      Johan Henriksson
+St. No:     71233143
+Unix Id :   k5c0b
+Email:      dat11jhe@student.lu.se
 
 ACKNOWLEDGMENTS :

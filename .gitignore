@@ -1,0 +1,55 @@
+# C development
+*.o
+*.ko
+*.obj
+*.elf
+*.lib
+*.a
+
+*.out
+*.dll
+*.so
+*.so.*
+*.dylib
+
+#Ignore for 313 assignment 
+cache-ref.o
+*.dat
+*.dos
+*.msdos
+fatinfo
+Sample*
+sample*
+*output*
+
+# Java development
+*.class
+*.jar
+*.war
+*.ear
+
+# Common text editor backup files
+*~
+\#*\#
+.emacs.desktop
+.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+.org-id-locations
+*_archive
+
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~

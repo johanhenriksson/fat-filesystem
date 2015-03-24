@@ -23,7 +23,6 @@ typedef enum FS_TYPE FS_TYPE;
 
 struct fsinfo_t
 {
-    int32_t  file_descriptor;  /* File descriptor returned by open().       */
     FS_TYPE  fs_type;
     void     *disk_start;      /* This is where in memory the disk starts   */
     size_t   sector_size;      /* Size of one sector on the disk.           */
@@ -46,7 +45,7 @@ typedef struct fsinfo_t fsinfo_t;
 /*
  * Function to open the file system.
  */
-void* open_filesystem(int argc, char *argv[]);
+void* open_filesystem(const char* filename);
 
 /*
  * This function sets up information about a FAT filesystem that will be used to read from

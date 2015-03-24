@@ -23,18 +23,8 @@ fatinfo.o: /usr/include/i386/_types.h /usr/include/sys/_types/_va_list.h
 fatinfo.o: /usr/include/sys/_types/_size_t.h /usr/include/sys/_types/_null.h
 fatinfo.o: /usr/include/sys/_types/_off_t.h
 fatinfo.o: /usr/include/sys/_types/_ssize_t.h /usr/include/secure/_stdio.h
-fatinfo.o: /usr/include/secure/_common.h fatfs.h /usr/include/stdlib.h
-fatinfo.o: /usr/include/sys/wait.h /usr/include/sys/_types/_pid_t.h
-fatinfo.o: /usr/include/sys/_types/_id_t.h /usr/include/sys/signal.h
-fatinfo.o: /usr/include/sys/appleapiopts.h /usr/include/machine/signal.h
-fatinfo.o: /usr/include/i386/signal.h /usr/include/machine/_mcontext.h
-fatinfo.o: /usr/include/i386/_mcontext.h /usr/include/mach/i386/_structs.h
-fatinfo.o: /usr/include/sys/_types/_sigaltstack.h
-fatinfo.o: /usr/include/sys/_types/_ucontext.h
-fatinfo.o: /usr/include/sys/_types/_pthread_attr_t.h
-fatinfo.o: /usr/include/sys/_types/_sigset_t.h
-fatinfo.o: /usr/include/sys/_types/_uid_t.h /usr/include/sys/resource.h
-fatinfo.o: /usr/include/stdint.h /usr/include/sys/_types/_int8_t.h
+fatinfo.o: /usr/include/secure/_common.h fat.h /usr/include/stdint.h
+fatinfo.o: /usr/include/sys/_types/_int8_t.h
 fatinfo.o: /usr/include/sys/_types/_int16_t.h
 fatinfo.o: /usr/include/sys/_types/_int32_t.h
 fatinfo.o: /usr/include/sys/_types/_int64_t.h /usr/include/_types/_uint8_t.h
@@ -43,6 +33,17 @@ fatinfo.o: /usr/include/_types/_uint64_t.h
 fatinfo.o: /usr/include/sys/_types/_intptr_t.h
 fatinfo.o: /usr/include/sys/_types/_uintptr_t.h
 fatinfo.o: /usr/include/_types/_intmax_t.h /usr/include/_types/_uintmax_t.h
+fatinfo.o: fatfs.h /usr/include/stdlib.h /usr/include/sys/wait.h
+fatinfo.o: /usr/include/sys/_types/_pid_t.h /usr/include/sys/_types/_id_t.h
+fatinfo.o: /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h
+fatinfo.o: /usr/include/machine/signal.h /usr/include/i386/signal.h
+fatinfo.o: /usr/include/machine/_mcontext.h /usr/include/i386/_mcontext.h
+fatinfo.o: /usr/include/mach/i386/_structs.h
+fatinfo.o: /usr/include/sys/_types/_sigaltstack.h
+fatinfo.o: /usr/include/sys/_types/_ucontext.h
+fatinfo.o: /usr/include/sys/_types/_pthread_attr_t.h
+fatinfo.o: /usr/include/sys/_types/_sigset_t.h
+fatinfo.o: /usr/include/sys/_types/_uid_t.h /usr/include/sys/resource.h
 fatinfo.o: /usr/include/sys/_types/_timeval.h /usr/include/machine/endian.h
 fatinfo.o: /usr/include/i386/endian.h /usr/include/sys/_endian.h
 fatinfo.o: /usr/include/libkern/_OSByteOrder.h
@@ -276,6 +277,11 @@ fatfs.o: /usr/include/sys/_types/_pthread_t.h
 fatfs.o: /usr/include/sys/_types/_pthread_key_t.h
 fatfs.o: /usr/include/sys/_types/_fsblkcnt_t.h
 fatfs.o: /usr/include/sys/_types/_fsfilcnt_t.h /usr/include/sys/mman.h
+fatfs.o: /usr/include/string.h /usr/include/strings.h
+fatfs.o: /usr/include/secure/_string.h fat.h /usr/include/stdint.h
+fatfs.o: /usr/include/_types/_uint8_t.h /usr/include/_types/_uint16_t.h
+fatfs.o: /usr/include/_types/_uint32_t.h /usr/include/_types/_uint64_t.h
+fatfs.o: /usr/include/_types/_intmax_t.h /usr/include/_types/_uintmax_t.h
 fatfs.o: fatfs.h /usr/include/stdlib.h /usr/include/sys/wait.h
 fatfs.o: /usr/include/sys/signal.h /usr/include/machine/signal.h
 fatfs.o: /usr/include/i386/signal.h /usr/include/machine/_mcontext.h
@@ -283,11 +289,8 @@ fatfs.o: /usr/include/i386/_mcontext.h /usr/include/mach/i386/_structs.h
 fatfs.o: /usr/include/sys/_types/_sigaltstack.h
 fatfs.o: /usr/include/sys/_types/_ucontext.h
 fatfs.o: /usr/include/sys/_types/_sigset_t.h /usr/include/sys/resource.h
-fatfs.o: /usr/include/stdint.h /usr/include/_types/_uint8_t.h
-fatfs.o: /usr/include/_types/_uint16_t.h /usr/include/_types/_uint32_t.h
-fatfs.o: /usr/include/_types/_uint64_t.h /usr/include/_types/_intmax_t.h
-fatfs.o: /usr/include/_types/_uintmax_t.h /usr/include/sys/_types/_timeval.h
-fatfs.o: /usr/include/alloca.h /usr/include/sys/_types/_ct_rune_t.h
+fatfs.o: /usr/include/sys/_types/_timeval.h /usr/include/alloca.h
+fatfs.o: /usr/include/sys/_types/_ct_rune_t.h
 fatfs.o: /usr/include/sys/_types/_rune_t.h /usr/include/sys/_types/_wchar_t.h
 fatfs.o: fat12.h fat32.h
 fat12.o: /usr/include/stdio.h /usr/include/sys/cdefs.h

@@ -9,7 +9,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <string.h>
 
+#include "fat.h"
 #include "fatfs.h"
 
 /**
@@ -30,20 +32,11 @@
 /*
  * Function to open the file system and map it into memory. 
  */
-void* open_filesystem(int argc, char *argv[])
+void* open_filesystem(const char* filename)
 {
-    char *filename;
     void *memory; 
     int fd;
     struct stat statBuff;
-
-    if (argc == 2) {
-        filename = argv[1];
-    }
-    else {
-        fprintf(stderr, USAGE, argv[0]);
-        exit(1);
-    }
 
     fd = open(filename, O_RDONLY);
     if (fd < 0) {
@@ -73,8 +66,25 @@ void* open_filesystem(int argc, char *argv[])
 fsinfo_t* fsinfo_init(void *disk_start)
 {
     fsinfo_t* fsinfo = (fsinfo_t*)malloc(sizeof(fsinfo_t));
+    memset(fsinfo, 0, sizeof(fsinfo_t));
     
-    // ADD CODE 
+    fsinfo->disk_start = disk_start;
+    
+    /* Read from boot sector */
+    bootsect_t* bootsect = (bootsect_t*)disk_start;
+
+    /* Verify */
+    if (bootsect->signature[0] != 0x55 || bootsect->signature[1] != 0xAA) {
+        perror("Invalid boot sector signature");
+        exit(1);
+    }
+
+    fsinfo->sector_size      = bootsect->sector_size;
+    fsinfo->cluster_size     = bootsect->cluster_size;
+    fsinfo->rootdir_size     = bootsect->root_dir_entries;
+    fsinfo->sectors_per_fat  = bootsect->fat_sector_size;
+    fsinfo->hidden_sectors   = bootsect->hidden_sectors;
+    fsinfo->reserved_sectors = bootsect->reserved_sectors;
 
     return fsinfo;
 }

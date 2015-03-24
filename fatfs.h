@@ -53,4 +53,6 @@ void* open_filesystem(const char* filename);
  */
 fsinfo_t* fsinfo_init(void *disk_start);
 
+FS_TYPE fs_type_detect(void* disk_start);
+
 #endif

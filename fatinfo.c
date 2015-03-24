@@ -33,15 +33,17 @@ void print_filesystem_info(const fsinfo_t* fsinfo)
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
+        printf("usage: fatinfo [file system image path]\n");
+        exit(1);
     }
 
-    void * mem = open_filesystem(argv[1]);
-    int i;
+    /* Open file system image */
+    void* mem = open_filesystem(argv[1]);
 
-    printf("size: %lu\n", sizeof(bootsect_t));
-
+    /* Read file system info */
     fsinfo_t* fsinfo = fsinfo_init(mem);
     print_filesystem_info(fsinfo);
+
     putchar('\n');
 
     // Add call to function to print the directory tree

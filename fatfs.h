@@ -37,7 +37,11 @@ struct fsinfo_t
     uint32_t fat_offset;       /* First sector of the first FAT copy.       */
     uint32_t rootdir_offset;   /* First sector of the root directory.       */
     uint32_t cluster_offset;   /* Sector number of the first cluster.       */
- 
+
+    // my stuff
+
+    uint32_t fat_count;
+    uint32_t clusters;         /* Total number of clusters */
 }; 
 
 typedef struct fsinfo_t fsinfo_t;

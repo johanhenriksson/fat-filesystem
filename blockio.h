@@ -11,8 +11,10 @@
 
 #include <stdlib.h>
 
+/* allocates a buffer and copies a block of memory to it */
+int block_copy(void** dest_ptr, void* src, size_t len);
 
-// Add prototypes and blockio specific routines here
-
+/* frees an allocated buffer and sets its pointer to null */
+int block_free(void** block_ptr); 
 
 #endif

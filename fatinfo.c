@@ -2,6 +2,7 @@
  * Program to print information about a FAT file system.
  */
 #include <stdio.h>
+#include <stddef.h>
 
 #include "fat.h"
 #include "fatfs.h"

@@ -12,6 +12,8 @@
 #include <string.h>
 
 #include "fat.h"
+#include "fat12.h"
+#include "fat32.h"
 #include "fatfs.h"
 
 /**
@@ -72,7 +74,6 @@ fsinfo_t* fsinfo_init(void *disk_start)
     
     fsinfo->disk_start = disk_start;
 
-    FS_TYPE type = fs_type_detect(disk_start);
     
     /* Read from boot sector */
     bootsect_common_t* bootsect = (bootsect_common_t*)disk_start;
@@ -82,46 +83,43 @@ fsinfo_t* fsinfo_init(void *disk_start)
     fsinfo->rootdir_size     = bootsect->root_dir_entries;
     fsinfo->reserved_sectors = bootsect->reserved_sectors;
     fsinfo->fat_count        = bootsect->fat_copies;
-
-    uint32_t sector_count = 0;
-    sector_count = *(uint16_t*)(disk_start + 0x13);
-    if (sector_count == 0) {
-        type = FAT32;
-        sector_count = *(uint32_t*)(disk_start + 0x20);
-    }
-
     fsinfo->sectors_for_root = fsinfo->rootdir_size * 32 / fsinfo->sector_size;
 
-    if (type == FAT12) {
+    fsinfo->fat_offset     = fsinfo->reserved_sectors;
+
+    /* determine file system type (FAT12/FAT32) */
+    fsinfo->type = fsinfo->rootdir_size == 0 ? FAT32 : FAT12;
+
+    /* version specific stuff */
+    if (fsinfo->type == FAT12) {
         printf("Filesystem type is FAT12\n");
         bootsect_fat12_t* bootsect_f12 = (bootsect_fat12_t*)disk_start;
 
         fsinfo->sectors_per_fat  = bootsect_f12->fat_size;
         fsinfo->hidden_sectors   = bootsect_f12->hidden_sectors;
+
+        fsinfo->rootdir_offset = fsinfo->fat_offset + fsinfo->fat_count * fsinfo->sectors_per_fat;
     }
 
-    if (type == FAT32) {
+    if (fsinfo->type == FAT32) {
         printf("Filesystem type is FAT32\n");
         bootsect_fat32_t* bootsect_f32 = (bootsect_fat32_t*)disk_start;
 
         fsinfo->sectors_per_fat  = bootsect_f32->fat_size;
         fsinfo->hidden_sectors   = bootsect_f32->hidden_sectors;
+
+        fsinfo->rootdir_offset   = bootsect_f32->root_cluster;
     }
 
-    fsinfo->fat_offset     = fsinfo->reserved_sectors;
-    fsinfo->rootdir_offset = fsinfo->fat_offset + fsinfo->fat_count * fsinfo->sectors_per_fat;
+    /* calculate offsets */
     fsinfo->cluster_offset = fsinfo->rootdir_offset + fsinfo->sectors_for_root;
 
     return fsinfo;
 }
 
-/** Detect file system type */
-FS_TYPE fs_type_detect(void* disk_start) {
-    return FAT12;
-}
-
 /* returns a pointer to the given cluster */
-void* cluster_ptr(fsinfo_t* fsinfo, uint32_t cluster_idx) {
+void* fs_cluster_ptr(fsinfo_t* fsinfo, uint32_t cluster_idx) 
+{
     /* disk_start + sector size * cluster_size * cluster_idx */
     size_t cluster_size = fsinfo->sector_size * fsinfo->cluster_size;
     return (void*)(fsinfo->disk_start + cluster_size * cluster_idx);

@@ -23,7 +23,7 @@ typedef enum FS_TYPE FS_TYPE;
 
 struct fsinfo_t
 {
-    FS_TYPE  fs_type;
+    FS_TYPE  type;
     void     *disk_start;      /* This is where in memory the disk starts   */
     size_t   sector_size;      /* Size of one sector on the disk.           */
     uint32_t cluster_size;     /* Number of sectors per cluster.            */
@@ -57,6 +57,6 @@ void* open_filesystem(const char* filename);
  */
 fsinfo_t* fsinfo_init(void *disk_start);
 
-FS_TYPE fs_type_detect(void* disk_start);
+void* fs_cluster_ptr(fsinfo_t* fsinfo, uint32_t cluster);
 
 #endif

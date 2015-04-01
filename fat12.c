@@ -24,4 +24,13 @@ uint32_t read_fat12(void* fat_start, uint32_t fat_idx)
     }
 }
 
-
+/* recursive function to determine length of fat12 cluster chain */
+uint32_t fat12_cluster_size(void* fat_start, uint32_t cluster_idx, uint32_t size) 
+{
+    uint32_t next = read_fat12(fat_start, cluster_idx);
+    
+    if (next < 0x002 || next >= 0xFF0) 
+        return size + 1;
+    
+    return fat12_cluster_size(fat_start, next, size + 1);
+}

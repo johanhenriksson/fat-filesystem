@@ -57,6 +57,6 @@ void* open_filesystem(const char* filename);
  */
 fsinfo_t* fsinfo_init(void *disk_start);
 
-void* fs_cluster_ptr(fsinfo_t* fsinfo, uint32_t cluster);
+void* fs_sector_ptr(fsinfo_t* fsinfo, uint32_t cluster);
 
 #endif

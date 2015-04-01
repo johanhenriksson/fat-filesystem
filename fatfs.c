@@ -15,6 +15,7 @@
 #include "fat12.h"
 #include "fat32.h"
 #include "fatfs.h"
+#include "direntry.h"
 
 /**
  * How to use this program.
@@ -61,7 +62,45 @@ void* open_filesystem(const char* filename)
     return memory;
 }
 
+void print_cluster_files(fsinfo_t* fsinfo, uint32_t sector_offset, uint32_t limit) 
+{
+    void* root_ptr = fs_sector_ptr(fsinfo, sector_offset);
+    int i = 0;
+    while(1)
+    {
+        direntry_t* dir = (direntry_t*)(root_ptr + i * sizeof(direntry_t));
+        i++;
 
+        /* end of directory */
+        if (dir->filename[0] == 0x00)
+            break;
+
+        /* deleted? */
+        if (dir_is_deleted(dir))
+            continue;
+
+        printf("Entry:\n");
+        printf("  Name:         %.8s.%.3s\n", dir->filename, dir->ext);
+        printf("  Cluster:      %u\n",        dir->cluster);
+        printf("  Cluster Size: %u\n",        dir_cluster_size(dir, fsinfo));
+        printf("  Is directory: %d\n",        dir_is_directory(dir));
+        printf("  Size:         %u\n",        dir->size);
+        printf("\n");
+
+        if (dir_is_directory(dir) && 
+            dir->cluster != 0 && 
+            dir->filename[0] != '.')
+        {
+            uint32_t sector = fsinfo->cluster_offset + (dir->cluster - 2) * fsinfo->cluster_size;
+
+            printf("Recursing into sector %u (at offset %lu)\n", sector, sector * fsinfo->sector_size);
+            print_cluster_files(fsinfo, sector, 0);
+        }
+
+        if (limit > 0 && i >= limit)
+            break;
+    }
+}
 
 /*
  * This function sets up information about a FAT filesystem that will be used to read from
@@ -74,7 +113,6 @@ fsinfo_t* fsinfo_init(void *disk_start)
     
     fsinfo->disk_start = disk_start;
 
-    
     /* Read from boot sector */
     bootsect_common_t* bootsect = (bootsect_common_t*)disk_start;
 
@@ -84,11 +122,12 @@ fsinfo_t* fsinfo_init(void *disk_start)
     fsinfo->reserved_sectors = bootsect->reserved_sectors;
     fsinfo->fat_count        = bootsect->fat_copies;
     fsinfo->sectors_for_root = fsinfo->rootdir_size * 32 / fsinfo->sector_size;
-
-    fsinfo->fat_offset     = fsinfo->reserved_sectors;
+    fsinfo->fat_offset       = fsinfo->reserved_sectors;
 
     /* determine file system type (FAT12/FAT32) */
-    fsinfo->type = fsinfo->rootdir_size == 0 ? FAT32 : FAT12;
+    fsinfo->type = fsinfo->rootdir_size == 0 
+        ? FAT32 
+        : FAT12;
 
     /* version specific stuff */
     if (fsinfo->type == FAT12) {
@@ -98,7 +137,8 @@ fsinfo_t* fsinfo_init(void *disk_start)
         fsinfo->sectors_per_fat  = bootsect_f12->fat_size;
         fsinfo->hidden_sectors   = bootsect_f12->hidden_sectors;
 
-        fsinfo->rootdir_offset = fsinfo->fat_offset + fsinfo->fat_count * fsinfo->sectors_per_fat;
+        fsinfo->rootdir_offset   = fsinfo->fat_offset + fsinfo->fat_count * fsinfo->sectors_per_fat;
+        fsinfo->cluster_offset   = fsinfo->rootdir_offset + fsinfo->sectors_for_root;
     }
 
     if (fsinfo->type == FAT32) {
@@ -109,19 +149,19 @@ fsinfo_t* fsinfo_init(void *disk_start)
         fsinfo->hidden_sectors   = bootsect_f32->hidden_sectors;
 
         fsinfo->rootdir_offset   = bootsect_f32->root_cluster;
+        fsinfo->cluster_offset = fsinfo->rootdir_offset + fsinfo->sectors_for_root;
     }
 
-    /* calculate offsets */
-    fsinfo->cluster_offset = fsinfo->rootdir_offset + fsinfo->sectors_for_root;
+    /* print stuff in root directory */
+    if (fsinfo->type == FAT12)
+        print_cluster_files(fsinfo, fsinfo->rootdir_offset, 512); 
+    if (fsinfo->type == FAT32)
+        print_cluster_files(fsinfo, fsinfo->rootdir_offset, 0); 
 
     return fsinfo;
 }
 
 /* returns a pointer to the given cluster */
-void* fs_cluster_ptr(fsinfo_t* fsinfo, uint32_t cluster_idx) 
-{
-    /* disk_start + sector size * cluster_size * cluster_idx */
-    size_t cluster_size = fsinfo->sector_size * fsinfo->cluster_size;
-    return (void*)(fsinfo->disk_start + cluster_size * cluster_idx);
+void* fs_sector_ptr(fsinfo_t* fsinfo, uint32_t sector) {
+    return (void*)(fsinfo->disk_start + sector * fsinfo->sector_size);
 }
-

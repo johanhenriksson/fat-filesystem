@@ -6,9 +6,6 @@
 
 #include "fat.h"
 #include "fatfs.h"
-#include "wordio.h"
-#include "blockio.h"
-#include "directory.h"
 
 /*
  * Function to print information about a FAT filesystem (useful for debugging).

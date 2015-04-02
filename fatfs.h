@@ -58,5 +58,10 @@ void* open_filesystem(const char* filename);
 fsinfo_t* fsinfo_init(void *disk_start);
 
 void* fs_sector_ptr(fsinfo_t* fsinfo, uint32_t cluster);
+uint32_t fs_cluster_sector(fsinfo_t* fsinfo, uint32_t sector);
+
+/* returns the next cluster */
+uint32_t fs_next_cluster(fsinfo_t* fsinfo, uint32_t cluster);
+uint32_t fs_cluster_size(fsinfo_t* fsinfo, uint32_t start_cluster);
 
 #endif

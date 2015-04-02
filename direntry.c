@@ -13,30 +13,49 @@
 #include "fat32.h"
 #include "direntry.h"
 
-bool dir_exists(direntry_t* dir) {
+bool entry_exists(direntry_t* dir) {
     if (dir->filename[0] == 0x00)
         return false;
-    return dir_is_deleted(dir);
+    return entry_is_deleted(dir);
 }
 
-bool dir_is_deleted(direntry_t* dir) {
+bool entry_is_deleted(direntry_t* dir) {
     return dir->filename[0] == 0xe5;
 }
 
-bool dir_is_directory(direntry_t* dir) {
-    return strncmp((const char*)dir->ext, "   ", 3) == 0;
+bool entry_is_directory(direntry_t* dir) 
+{
+    if (dir->filename[0] == '.')
+        return true;
+    return entry_extlen(dir) == 0;
 }
 
-uint32_t dir_cluster_size(direntry_t* dir, fsinfo_t* fsinfo) 
+uint32_t entry_totlen(direntry_t* dir) 
 {
-    void* fat_start = fs_sector_ptr(fsinfo, fsinfo->fat_offset);
-    if (fsinfo->type == FAT12) {
-        return fat12_cluster_size(fat_start, dir->cluster, 0);
-    }
-    if (fsinfo->type == FAT32) {
-        return fat32_cluster_size(fat_start, dir->cluster, 0);
-    }
+    uint32_t extlen = entry_extlen(dir);
+    if (extlen > 0)
+        extlen++; // add the fucking dot
+    return entry_namelen(dir) + extlen;
+}
 
-    printf("Unknown file system type\n");
-    exit(1);
+uint32_t entry_namelen(direntry_t* dir) 
+{
+    uint32_t len = 8;
+    while(len > 0) {
+        if (dir->filename[len - 1] != 0x20)
+            break;
+        len--;
+    }
+    return len;
+}
+
+uint32_t entry_extlen(direntry_t* dir)
+{
+    uint32_t ext_len = 3;
+    while(ext_len > 0) {
+        if (dir->ext[ext_len - 1] != 0x20)
+            break;
+        ext_len--;
+    }
+    return ext_len;
 }

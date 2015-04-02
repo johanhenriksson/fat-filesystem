@@ -26,6 +26,5 @@ __attribute((packed));
 typedef struct bootsect_fat12_t bootsect_fat12_t;
 
 uint32_t read_fat12(void* fat_start, uint32_t fat_idx);
-uint32_t fat12_cluster_size(void* fat_start, uint32_t cluster_idx, uint32_t size); 
 
 #endif

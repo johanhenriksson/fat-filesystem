@@ -26,11 +26,13 @@ typedef enum DIR_ATTR DIR_ATTR;
 
 struct direntry_t 
 {
-    uint8_t     filename[8];
-    uint8_t     ext[3];
-    uint8_t     attr;
-    uint8_t     reserved[10];
+    uint8_t     filename[8]; 
+    uint8_t     ext[3]; 
+    uint8_t     attr; 
+    uint8_t     reserved[8]; 
+    uint16_t    high_cluster    __attribute((packed));
 
+    /* 0x15 */
     /* bit fields - total size 32 bits */
     uint32_t    hour     : 5    __attribute((packed));
     uint32_t    minute   : 6    __attribute((packed));
@@ -46,9 +48,11 @@ __attribute((packed));
 
 typedef struct direntry_t direntry_t;
 
-bool dir_exists(direntry_t* dir);
-bool dir_is_deleted(direntry_t* dir); 
-bool dir_is_directory(direntry_t* dir);
-uint32_t dir_cluster_size(direntry_t* dir, fsinfo_t* fsinfo);
+bool entry_exists(direntry_t* dir);
+bool entry_is_deleted(direntry_t* dir); 
+bool entry_is_directory(direntry_t* dir);
+uint32_t entry_totlen(direntry_t* dir);
+uint32_t entry_namelen(direntry_t* dir);
+uint32_t entry_extlen(direntry_t* dir);
 
 #endif

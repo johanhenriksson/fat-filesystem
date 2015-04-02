@@ -45,5 +45,8 @@ int main(int argc, char *argv[])
 
     putchar('\n');
 
-    directory_root(fsinfo, fsinfo->rootdir_offset);
+    /* read file system */
+    directory_t* root = directory_root(fsinfo, fsinfo->rootdir_offset);
+    directory_root_print(root);
+    directory_free(&root);
 }

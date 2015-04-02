@@ -78,7 +78,6 @@ fsinfo_t* fsinfo_init(void *disk_start)
 
     /* version specific stuff */
     if (fsinfo->type == FAT12) {
-        printf("Filesystem type is FAT12\n");
         bootsect_fat12_t* bootsect_f12 = (bootsect_fat12_t*)disk_start;
 
         fsinfo->sectors_per_fat  = bootsect_f12->fat_size;
@@ -89,7 +88,6 @@ fsinfo_t* fsinfo_init(void *disk_start)
     }
 
     if (fsinfo->type == FAT32) {
-        printf("Filesystem type is FAT32\n");
         bootsect_fat32_t* bootsect_f32 = (bootsect_fat32_t*)disk_start;
 
         fsinfo->sectors_per_fat  = bootsect_f32->fat_size;
@@ -98,16 +96,6 @@ fsinfo_t* fsinfo_init(void *disk_start)
         fsinfo->rootdir_offset   = fsinfo->fat_offset + bootsect_f32->fat_size * fsinfo->fat_count;
         fsinfo->cluster_offset   = fsinfo->rootdir_offset;
     }
-
-    /* print stuff in root directory */
-    /*
-    if (fsinfo->type == FAT12)
-        print_cluster_files(fsinfo, fsinfo->rootdir_offset, 512); 
-    if (fsinfo->type == FAT32) {
-        printf("root cluster: %d\n", fs_cluster_sector(fsinfo, 3));
-        print_cluster_files(fsinfo, fs_cluster_sector(fsinfo, 5), 10); 
-    }
-    */
 
     return fsinfo;
 }

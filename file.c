@@ -21,13 +21,6 @@ file_t* file_init(fsinfo_t* fsinfo, direntry_t* entry, directory_t* dir)
 
     file->path = file_path(file);
 
-    printf("Filename: %s\n", file->path);
-    printf("Size: %u\n", file->byte_size);
-    printf("Clusters: %u", file->cluster);
-    if (file->cluster_size > 1)
-        printf("-%u", file->cluster + file->cluster_size - 1);
-    printf("\n\n");
-
     return file;
 }
 
@@ -55,4 +48,25 @@ char* file_path(file_t* file)
     path[parent_len + namelen + 1] = '.';
     
     return path;
+}
+
+void file_free(file_t** file_ptr) 
+{
+    assert(file_ptr);
+    file_t* file = *file_ptr;
+
+    free(file->path);
+    free(file);
+
+    *file_ptr = NULL;
+}
+
+void file_print(file_t* file) 
+{
+    printf("Filename: %s\n", file->path + 6); /* 6 removes root label */
+    printf("Size: %u\n", file->byte_size);
+    printf("Clusters: %u", file->cluster);
+    if (file->cluster_size > 1)
+        printf("-%u", file->cluster + file->cluster_size - 1);
+    printf("\n\n");
 }

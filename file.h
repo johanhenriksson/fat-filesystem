@@ -17,5 +17,8 @@ struct file_t
 };
 
 file_t* file_init(fsinfo_t* fsinfo, direntry_t* entry, directory_t* dir); 
+void file_free(file_t** file_ptr);
+
+void file_print(file_t* file);
 
 #endif

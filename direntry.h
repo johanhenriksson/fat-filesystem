@@ -48,9 +48,9 @@ __attribute((packed));
 
 typedef struct direntry_t direntry_t;
 
-bool entry_exists(direntry_t* dir);
-bool entry_is_deleted(direntry_t* dir); 
-bool entry_is_directory(direntry_t* dir);
+bool     entry_exists(direntry_t* dir);
+bool     entry_is_deleted(direntry_t* dir); 
+bool     entry_is_directory(direntry_t* dir);
 uint32_t entry_totlen(direntry_t* dir);
 uint32_t entry_namelen(direntry_t* dir);
 uint32_t entry_extlen(direntry_t* dir);

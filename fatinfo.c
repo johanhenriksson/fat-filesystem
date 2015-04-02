@@ -6,6 +6,7 @@
 
 #include "fat.h"
 #include "fatfs.h"
+#include "directory.h"
 
 /*
  * Function to print information about a FAT filesystem (useful for debugging).
@@ -44,6 +45,5 @@ int main(int argc, char *argv[])
 
     putchar('\n');
 
-    // Add call to function to print the directory tree
-    
+    directory_root(fsinfo, fsinfo->rootdir_offset);
 }

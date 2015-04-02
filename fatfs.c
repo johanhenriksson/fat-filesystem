@@ -19,22 +19,6 @@
 #include "direntry.h"
 #include "directory.h"
 
-/**
- * How to use this program.
- */
-#define USAGE "Usage: %s file-system-file\n"
-
-/*
- * Default size of one sector.
- */
-#define DEFAULT_SECTOR_SIZE 512
-
-/*
- * Size of one directory entry.
- */
-#define DIR_ENTRY_SIZE 32
-#define CLUSTER_OFFSET -2
-
 /*
  * Function to open the file system and map it into memory. 
  */
@@ -63,62 +47,6 @@ void* open_filesystem(const char* filename)
         exit(1);
     }
     return memory;
-}
-
-void print_cluster_files(fsinfo_t* fsinfo, uint32_t sector_offset, uint32_t limit) 
-{
-    void* root_ptr = fs_sector_ptr(fsinfo, sector_offset);
-    int i = 0;
-
-    printf("Root at sector %u (at offset %lu)\n", sector_offset, sector_offset * fsinfo->sector_size);
-    while(1)
-    {
-        direntry_t* dir = (direntry_t*)(root_ptr + i * sizeof(direntry_t));
-        i++;
-
-        /* end of directory */
-        if (dir->filename[0] == 0x00)
-            break;
-
-        /* deleted? */
-        if (entry_is_deleted(dir))
-            continue;
-
-        printf("Entry %d:\n", i);
-        printf("  Name:         %.8s.%.3s\n", dir->filename, dir->ext);
-        printf("  Cluster:      %u\n",        dir->cluster);
-        printf("  Cluster Size: %u\n",        fs_cluster_size(fsinfo, dir->cluster));
-        printf("  Is directory: %d\n",        entry_is_directory(dir));
-
-        printf("  Name length:  %u\n",        entry_namelen(dir));
-
-        if (dir->attr == 0x0F)
-            printf("  Long file name (%u)\n", dir->filename[0]);
-        else if (dir->attr & DIR_VOLUME_LABEL) 
-            printf("  Volume Label\n"); 
-
-
-        printf("\n");
-
-        if (entry_is_directory(dir) && 
-            dir->cluster != 0 && 
-            dir->filename[0] != '.')
-        {
-            uint32_t cluster = dir->cluster;
-            if (fsinfo->type == FAT32) {
-                /* add fat32 high order bytes */
-                cluster += ((uint32_t)dir->high_cluster) << 16;
-            }
-
-            uint32_t sector = fsinfo->cluster_offset + (cluster - 2) * fsinfo->cluster_size;
-
-            printf("Recursing into sector %u (at offset %lu)\n", sector, sector * fsinfo->sector_size);
-            print_cluster_files(fsinfo, sector, 0);
-        }
-
-        if (limit > 0 && i >= limit)
-            break;
-    }
 }
 
 /*
@@ -180,7 +108,6 @@ fsinfo_t* fsinfo_init(void *disk_start)
         print_cluster_files(fsinfo, fs_cluster_sector(fsinfo, 5), 10); 
     }
     */
-    directory_t* root = directory_root(fsinfo, 2);
 
     return fsinfo;
 }

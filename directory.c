@@ -24,9 +24,15 @@ directory_t* directory_init(fsinfo_t* fsinfo, direntry_t* entry, directory_t* pa
     dir->cluster_size = fs_cluster_size(fsinfo, entry->cluster);
     dir->path = directory_path(dir);
 
-    printf("Directory: %s\n", dir->path);
+    printf("Filename: %s\n", dir->path);
+    printf("This file is a directory.\n");
+    printf("Clusters: %u", dir->cluster);
+    if (dir->cluster_size > 1)
+        printf("-%u", dir->cluster + dir->cluster_size - 1);
+    printf("\n\n");
 
-    directory_fill(fsinfo, dir);
+    if (dir->entry->filename[0] != '.')
+        directory_fill(fsinfo, dir);
 
     return dir;
 }
@@ -40,8 +46,8 @@ directory_t* directory_root(fsinfo_t* fsinfo, uint32_t root_cluster)
     dir->cluster = root_cluster;
     dir->cluster_size = fs_cluster_size(fsinfo, root_cluster);
     
-    char* root_name = malloc(2 * sizeof(char));
-    root_name = "/";
+    char* root_name = malloc(sizeof(char));
+    root_name[0] = '\0';
     dir->path = root_name;
 
     if (fsinfo->type == FAT32) {
@@ -55,11 +61,11 @@ directory_t* directory_root(fsinfo_t* fsinfo, uint32_t root_cluster)
         uint32_t max_root_dirs = 32 * fsinfo->sector_size / sizeof(direntry_t);
 
         void* root_ptr = fs_sector_ptr(fsinfo, fsinfo->rootdir_offset);
-        for (i = 0; i < max_root_dirs; i++) {
+        for (i = 0; i < max_root_dirs; i++) 
+        {
             direntry_t* child = (direntry_t*)((intptr_t)root_ptr + i * sizeof(direntry_t));
             if (child->filename[0] == 0x00) break;
             if (child->filename[0] == 0xE5) continue;
-            if (child->filename[0] == '.')  continue;
 
             if (entry_is_directory(child)) {
                 directory_t* subdir = directory_init(fsinfo, child, dir);
@@ -89,7 +95,6 @@ void directory_fill(fsinfo_t* fsinfo, directory_t* dir)
 
             if (child->filename[0] == 0x00) break;
             if (child->filename[0] == 0xE5) continue;
-            if (child->filename[0] == '.')  continue;
 
             if (entry_is_directory(child)) {
                 /* create subdirectory entry */
@@ -131,8 +136,8 @@ char* directory_path(directory_t* dir)
     if (parent_len > 0)
         strncpy(path, parent_name, parent_len);
     
-    strncpy(path + parent_len, (const char*)dir->entry->filename, namelen);
-    path[parent_len + namelen] = '/';
+    strncpy(path + parent_len + 1, (const char*)dir->entry->filename, namelen);
+    path[parent_len] = '/';
 
     return path;
 }

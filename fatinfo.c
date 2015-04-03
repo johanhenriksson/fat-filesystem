@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
 
     /* read file system */
     directory_t* root = directory_root(fsinfo, fsinfo->rootdir_offset);
-    directory_root_print(root);
+    directory_print_root(root);
+    printf("[Struct memory size: %lu bytes]\n", directory_mem_size(root));
     directory_free(&root);
 }

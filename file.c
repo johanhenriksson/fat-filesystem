@@ -44,8 +44,11 @@ char* file_path(file_t* file)
         strncpy(path, parent->path, parent_len);
 
     strncpy(path + parent_len + 1, (const char*)file->entry->filename, namelen);
-    strncpy(path + parent_len + namelen + 2, (const char*)file->entry->ext, extlen);
-    path[parent_len + namelen + 1] = '.';
+
+    if (extlen) {
+        path[parent_len + namelen + 1] = '.';
+        strncpy(path + parent_len + namelen + 2, (const char*)file->entry->ext, extlen);
+    }
     
     return path;
 }

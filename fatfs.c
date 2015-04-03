@@ -93,8 +93,8 @@ fsinfo_t* fsinfo_init(void *disk_start)
         fsinfo->sectors_per_fat  = bootsect_f32->fat_size;
         fsinfo->hidden_sectors   = bootsect_f32->hidden_sectors;
 
-        fsinfo->rootdir_offset   = fsinfo->fat_offset + bootsect_f32->fat_size * fsinfo->fat_count;
-        fsinfo->cluster_offset   = fsinfo->rootdir_offset;
+        fsinfo->cluster_offset   = fsinfo->fat_offset + bootsect_f32->fat_size * fsinfo->fat_count;
+        fsinfo->rootdir_offset   = bootsect_f32->root_cluster;
     }
 
     return fsinfo;
@@ -107,7 +107,7 @@ void* fs_sector_ptr(fsinfo_t* fsinfo, uint32_t sector) {
 
 uint32_t fs_cluster_sector(fsinfo_t* fsinfo, uint32_t cluster) {
     if (cluster < 2) {
-        printf("Clusters 0 and 1 cannot be accessed\n");
+        printf("Clusters 0 and 1 cannot be accessed (%u)\n", cluster);
         exit(1);
     }
     return fsinfo->cluster_offset + (cluster + CLUSTER_OFFSET) * fsinfo->cluster_size;

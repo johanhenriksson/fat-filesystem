@@ -24,6 +24,7 @@ directory_t* directory_init(fsinfo_t* fsinfo, direntry_t* entry, directory_t* pa
     dir->parent  = parent;
     dir->cluster = entry->cluster;
     dir->cluster_size = fs_cluster_size(fsinfo, entry->cluster);
+    dir->byte_size    = 0;
     dir->path = directory_path(dir);
 
     /* Allocate subdirectory & file lists */
@@ -41,15 +42,16 @@ void directory_print(directory_t* dir)
 {
     printf("Filename: %s\n", dir->path + 6); /* 6 skips root label */
     printf("This file is a directory.\n");
+    printf("Size: %u bytes\n", dir->byte_size, dir->cluster_size);
     printf("Clusters: %u", dir->cluster);
     if (dir->cluster_size > 1)
         printf("-%u", dir->cluster + dir->cluster_size - 1);
     printf("\n\n");
 
-    directory_root_print(dir);
+    directory_print_root(dir);
 }
 
-void directory_root_print(directory_t* directory)
+void directory_print_root(directory_t* directory)
 {
     int i;
     for(i = 0; i < directory->subdir_count; i++) 
@@ -85,7 +87,9 @@ directory_t* directory_root(fsinfo_t* fsinfo, uint32_t root_cluster)
         {
             direntry_t* child = (direntry_t*)((intptr_t)root_ptr + i * sizeof(direntry_t));
             if (child->filename[0] == 0x00) break;
-            if (child->filename[0] == 0xE5) continue;
+            if (child->filename[0] == 0xE5) continue; /* Deleted file */
+            if (child->attr & DIR_VOLUME_LABEL) continue; /* Volume labels */
+            if (child->attr == 0x0F) continue; /* VFAT extended file names */
 
             if (entry_is_directory(child)) {
                 directory_t* subdir = directory_init(fsinfo, child, dir);
@@ -119,7 +123,9 @@ void directory_fill(fsinfo_t* fsinfo, directory_t* dir)
             direntry_t* child = (direntry_t*)((intptr_t)cluster_ptr + i * sizeof(direntry_t));
 
             if (child->filename[0] == 0x00) break;
-            if (child->filename[0] == 0xE5) continue;
+            if (child->filename[0] == 0xE5) continue; /* Deleted file */
+            if (child->attr & DIR_VOLUME_LABEL) continue; /* Volume labels */
+            if (child->attr == 0x0F) continue; /* VFAT extended file names */
 
             if (entry_is_directory(child)) {
                 /* create subdirectory entry */
@@ -206,4 +212,22 @@ void directory_append_file(directory_t* dir, file_t* file) {
 
     /* append to list */
     dir->files[dir->file_count++] = file;
+    dir->byte_size += file->byte_size;
+}
+
+size_t directory_mem_size(directory_t* dir) 
+{
+    size_t size = sizeof(directory_t) + 
+                  strlen(dir->path) + 1 +
+                  dir->max_subdirs * sizeof(directory_t*) +
+                  dir->max_files * sizeof(file_t*);
+
+    int i;
+    for(i = 0; i < dir->subdir_count; i++) 
+        size += directory_mem_size(dir->subdirs[i]);
+
+    for(i = 0; i < dir->file_count; i++) 
+        size += sizeof(file_t) + strlen(dir->files[i]->path) + 1;
+
+    return size;
 }

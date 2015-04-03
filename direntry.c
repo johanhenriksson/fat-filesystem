@@ -23,11 +23,10 @@ bool entry_is_deleted(direntry_t* dir) {
     return dir->filename[0] == 0xe5;
 }
 
-bool entry_is_directory(direntry_t* dir) 
-{
+bool entry_is_directory(direntry_t* dir) {
     if (dir->filename[0] == '.')
         return true;
-    return entry_extlen(dir) == 0;
+    return dir->attr & DIR_SUBDIR; 
 }
 
 uint32_t entry_totlen(direntry_t* dir) 
